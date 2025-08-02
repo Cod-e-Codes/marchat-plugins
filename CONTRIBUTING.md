@@ -181,7 +181,16 @@ Use appropriate categories for your plugin:
 
 ## License
 
-By contributing plugins, you agree to license your plugin under the MIT License, the same license as marchat.
+marchat is licensed under the MIT License.
+
+Community-contributed plugins may be released under **any OSI-approved license**, provided they are clearly labeled. When submitting a plugin to the official registry, you agree to:
+
+- Clearly state your plugin’s license in its README or metadata
+- Allow non-commercial listing in the plugin store and registry
+
+Official plugins maintained by the marchat team may be dual-licensed or offered under separate commercial terms.
+
+For licensing or inclusion questions, contact cod.e.codes.dev@gmail.com
 
 ---
 
