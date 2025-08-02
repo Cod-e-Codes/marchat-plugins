@@ -1,5 +1,3 @@
-# CONTRIBUTING.md
-
 ## Contributing Plugins to marchat
 
 Thank you for your interest in contributing plugins to marchat! This guide will help you create and submit plugins to the community registry.
