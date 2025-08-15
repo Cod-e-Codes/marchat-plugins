@@ -9,7 +9,7 @@
       "author": "Cod-e-Codes",
       "homepage": "https://github.com/Cod-e-Codes/marchat",
       "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v1.0.0/echo-plugin-v1.0.0.zip",
-      "checksum": "sha256:ecfa1ba034a52b963d643770b24c4fc41359e8101a9152744eabb1daed93f354",
+      "checksum": "sha256:5eec9c09774735c1b95f3ffebb6ab685bd03965de37a0e383e596c1bbd26f339",
       "category": "utility",
       "tags": ["chat", "utility", "echo", "test"],
       "min_version": "0.2.0-beta.1"
