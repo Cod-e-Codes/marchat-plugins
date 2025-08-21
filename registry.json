@@ -1,17 +1,47 @@
 {
-  "version": "1.0.0",
-  "last_updated": "2024-01-01T00:00:00Z",
+  "version": "2.0.0",
+  "last_updated": "2025-08-21T00:00:00Z",
   "plugins": [
     {
       "name": "echo",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "description": "Simple echo plugin for testing the plugin system",
       "author": "Cod-e-Codes",
       "homepage": "https://github.com/Cod-e-Codes/marchat",
-      "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v1.0.0/echo-plugin-v1.0.0.zip",
-      "checksum": "sha256:5eec9c09774735c1b95f3ffebb6ab685bd03965de37a0e383e596c1bbd26f339",
+      "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v2.0.0/echo-plugin-v2.0.0-windows-amd64.zip",
+      "checksum": "sha256:0b91eb1f2029913159632430ce54b19b55afc5c1b96b266862ec6705305b9c8e",
+      "goos": "windows",
+      "goarch": "amd64",
       "category": "utility",
-      "tags": ["chat", "utility", "echo", "test"],
+      "tags": ["chat", "utility", "echo", "test", "windows", "amd64"],
+      "min_version": "0.2.0-beta.1"
+    },
+    {
+      "name": "echo",
+      "version": "2.0.0",
+      "description": "Simple echo plugin for testing the plugin system",
+      "author": "Cod-e-Codes",
+      "homepage": "https://github.com/Cod-e-Codes/marchat",
+      "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v2.0.0/echo-plugin-v2.0.0-linux-amd64.zip",
+      "checksum": "sha256:e20491aa50ce6e110591ad3624fdd15059b5ea57ced5abd8b1404f4a63ed55cf",
+      "goos": "linux",
+      "goarch": "amd64",
+      "category": "utility",
+      "tags": ["chat", "utility", "echo", "test", "linux", "amd64"],
+      "min_version": "0.2.0-beta.1"
+    },
+    {
+      "name": "echo",
+      "version": "2.0.0",
+      "description": "Simple echo plugin for testing the plugin system",
+      "author": "Cod-e-Codes",
+      "homepage": "https://github.com/Cod-e-Codes/marchat",
+      "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v2.0.0/echo-plugin-v2.0.0-darwin-amd64.zip",
+      "checksum": "sha256:b5c4db56960b7695d7a61b6fdbd0b8c58732619063e686fe28a9d1c9a84f1682",
+      "goos": "darwin",
+      "goarch": "amd64",
+      "category": "utility",
+      "tags": ["chat", "utility", "echo", "test", "darwin", "amd64"],
       "min_version": "0.2.0-beta.1"
     }
   ]
