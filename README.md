@@ -28,7 +28,7 @@ Use the marchat plugin store:
 
 Or install directly:
 ```bash
-:plugin install echo
+:install echo
 ```
 
 ## Publishing plugins
