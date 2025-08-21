@@ -1,0 +1,21 @@
+{
+  "license": "MIT",
+  "commands": [
+    {
+      "usage": ":echo <message>",
+      "admin_only": false,
+      "name": "echo",
+      "description": "Echo a message"
+    },
+    {
+      "usage": ":echo-admin <message>",
+      "admin_only": true,
+      "name": "echo-admin",
+      "description": "Echo a message (admin only)"
+    }
+  ],
+  "name": "echo",
+  "description": "Simple echo plugin for testing the marchat plugin system",
+  "version": "2.0.0",
+  "author": "Cod-e-Codes"
+}
