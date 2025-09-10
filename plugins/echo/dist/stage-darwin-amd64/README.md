@@ -64,7 +64,7 @@ VERSION=2.0.0 GOOS=linux GOARCH=amd64 bash build.sh
 
 ### Naming convention
 - `echo-plugin-v<version>-<goos>-<goarch>.zip`
-  - Examples: `echo-plugin-v2.0.0-windows-amd64.zip`, `echo-plugin-v2.0.0-darwin-arm64.zip`
+  - Examples: `echo-plugin-v2.0.0-windows-amd64.zip`, `echo-plugin-v2.0.0-darwin-amd64.zip`
 
 ## Usage Examples
 

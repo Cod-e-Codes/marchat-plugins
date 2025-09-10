@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Cod-e-Codes/marchat/plugin/sdk"
@@ -175,9 +176,49 @@ func (p *EchoPlugin) handleRequest(req sdk.PluginRequest) sdk.PluginResponse {
 
 		// Handle echo command
 		if req.Command == "echo" && len(args) > 0 {
+			// Handle quoted arguments
+			var content string
+			if len(args) == 1 && strings.HasPrefix(args[0], `"`) && strings.HasSuffix(args[0], `"`) {
+				// Single quoted argument
+				content = strings.Trim(args[0], `"`)
+			} else {
+				// Join all arguments into a single message
+				content = strings.Join(args, " ")
+			}
+
+			log.Printf("Echoing content: '%s'", content)
+
 			echoMsg := sdk.Message{
 				Sender:    "EchoBot",
-				Content:   args[0],
+				Content:   content,
+				CreatedAt: time.Now(),
+			}
+
+			responseData, _ := json.Marshal(echoMsg)
+			return sdk.PluginResponse{
+				Type:    "message",
+				Success: true,
+				Data:    responseData,
+			}
+		}
+
+		// Handle echo-admin command
+		if req.Command == "echo-admin" && len(args) > 0 {
+			// Handle quoted arguments
+			var content string
+			if len(args) == 1 && strings.HasPrefix(args[0], `"`) && strings.HasSuffix(args[0], `"`) {
+				// Single quoted argument
+				content = strings.Trim(args[0], `"`)
+			} else {
+				// Join all arguments into a single message
+				content = strings.Join(args, " ")
+			}
+
+			log.Printf("Echoing admin content: '%s'", content)
+
+			echoMsg := sdk.Message{
+				Sender:    "EchoBot",
+				Content:   content,
 				CreatedAt: time.Now(),
 			}
 

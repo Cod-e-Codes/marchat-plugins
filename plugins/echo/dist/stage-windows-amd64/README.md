@@ -44,17 +44,17 @@ Builds produce a single archive targeted to your OS/architecture. The host valid
 ### PowerShell (Windows)
 ```powershell
 # From this directory
-./build.ps1 -Version 1.0.0 -Os windows -Arch amd64
-# Output: dist/echo-plugin-v1.0.0-windows-amd64.zip and .sha256
+./build.ps1 -Version 2.0.0 -Os windows -Arch amd64
+# Output: dist/echo-plugin-v2.0.0-windows-amd64.zip and .sha256
 ```
 
 ### Bash (Linux/macOS)
 ```bash
 # From this directory
-bash build.sh # uses defaults VERSION=1.0.0, GOOS/GOARCH from env
+VERSION=2.0.0 bash build.sh # uses GOOS/GOARCH from env
 # or override
-VERSION=1.0.0 GOOS=linux GOARCH=amd64 bash build.sh
-# Output: dist/echo-plugin-v1.0.0-linux-amd64.zip and .sha256
+VERSION=2.0.0 GOOS=linux GOARCH=amd64 bash build.sh
+# Output: dist/echo-plugin-v2.0.0-linux-amd64.zip and .sha256
 ```
 
 ### Archive contents
@@ -64,7 +64,7 @@ VERSION=1.0.0 GOOS=linux GOARCH=amd64 bash build.sh
 
 ### Naming convention
 - `echo-plugin-v<version>-<goos>-<goarch>.zip`
-  - Examples: `echo-plugin-v1.0.0-windows-amd64.zip`, `echo-plugin-v1.0.0-darwin-arm64.zip`
+  - Examples: `echo-plugin-v2.0.0-windows-amd64.zip`, `echo-plugin-v2.0.0-darwin-amd64.zip`
 
 ## Usage Examples
 
