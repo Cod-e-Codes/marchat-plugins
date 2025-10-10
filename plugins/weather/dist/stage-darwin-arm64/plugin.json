@@ -1,0 +1,21 @@
+{
+  "name": "weather",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Cod-e-Codes",
+  "description": "Get weather information using wttr.in",
+  "commands": [
+    {
+      "name": "weather",
+      "admin_only": false,
+      "usage": ":weather [location]",
+      "description": "Get current weather for a location"
+    },
+    {
+      "name": "forecast",
+      "admin_only": false,
+      "usage": ":forecast [location]",
+      "description": "Get weather forecast for a location"
+    }
+  ]
+}

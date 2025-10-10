@@ -1,0 +1,39 @@
+{
+  "name": "githooks",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Cod-e-Codes",
+  "description": "Git repository management and status updates",
+  "commands": [
+    {
+      "name": "git-status",
+      "admin_only": false,
+      "usage": ":git-status [path]",
+      "description": "Show git status of current directory"
+    },
+    {
+      "name": "git-log",
+      "admin_only": false,
+      "usage": ":git-log [n] [path]",
+      "description": "Show recent git commits"
+    },
+    {
+      "name": "git-branch",
+      "admin_only": false,
+      "usage": ":git-branch [path]",
+      "description": "Show current git branch and available branches"
+    },
+    {
+      "name": "git-diff",
+      "admin_only": false,
+      "usage": ":git-diff [path]",
+      "description": "Show git diff of uncommitted changes"
+    },
+    {
+      "name": "git-watch",
+      "admin_only": true,
+      "usage": ":git-watch <path>",
+      "description": "Watch a repository for changes (admin only)"
+    }
+  ]
+}

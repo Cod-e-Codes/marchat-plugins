@@ -17,7 +17,9 @@ If a user installs a plugin binary for the wrong platform, the host will refuse 
 
 ## Available Plugins
 
-- **echo**: Simple echo plugin for testing the plugin system
+- **echo** (v2.0.1): Simple echo plugin for testing the plugin system
+- **weather** (v1.0.0): Get weather information and forecasts using wttr.in
+- **githooks** (v1.0.0): Git repository management with status, log, branch, and diff commands
 
 ## Installing Plugins
 
