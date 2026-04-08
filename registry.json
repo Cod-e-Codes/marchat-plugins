@@ -1,6 +1,6 @@
 {
-  "version": "3.0.0",
-  "last_updated": "2025-10-10T00:00:00Z",
+  "version": "3.1.0",
+  "last_updated": "2026-04-07T00:00:00Z",
   "plugins": [
     {
       "name": "echo",
@@ -36,12 +36,40 @@
       "description": "Simple echo plugin for testing the plugin system",
       "author": "Cod-e-Codes",
       "homepage": "https://github.com/Cod-e-Codes/marchat",
+      "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v2.0.1/echo-plugin-v2.0.1-linux-arm64.zip",
+      "checksum": "sha256:d424319308f8ddc74ec4d9b6e4c1c60e2ef456c23f52b3da313b5fa2b951f307",
+      "goos": "linux",
+      "goarch": "arm64",
+      "category": "utility",
+      "tags": ["chat", "utility", "echo", "test", "linux", "arm64"],
+      "min_version": "0.2.0-beta.1"
+    },
+    {
+      "name": "echo",
+      "version": "2.0.1",
+      "description": "Simple echo plugin for testing the plugin system",
+      "author": "Cod-e-Codes",
+      "homepage": "https://github.com/Cod-e-Codes/marchat",
       "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v2.0.1/echo-plugin-v2.0.1-darwin-amd64.zip",
       "checksum": "sha256:6d6e8aa05cb950c409cf7825dd650946d4317ffb6f9726afe322a2b2cdefc716",
       "goos": "darwin",
       "goarch": "amd64",
       "category": "utility",
       "tags": ["chat", "utility", "echo", "test", "darwin", "amd64"],
+      "min_version": "0.2.0-beta.1"
+    },
+    {
+      "name": "echo",
+      "version": "2.0.1",
+      "description": "Simple echo plugin for testing the plugin system",
+      "author": "Cod-e-Codes",
+      "homepage": "https://github.com/Cod-e-Codes/marchat",
+      "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v2.0.1/echo-plugin-v2.0.1-darwin-arm64.zip",
+      "checksum": "sha256:c58f629b7a64e4f8ba94c1ada1517367d415db69c37e49534bcaa5937df9b36c",
+      "goos": "darwin",
+      "goarch": "arm64",
+      "category": "utility",
+      "tags": ["chat", "utility", "echo", "test", "darwin", "arm64"],
       "min_version": "0.2.0-beta.1"
     },
     {
@@ -70,6 +98,20 @@
       "goarch": "amd64",
       "category": "utility",
       "tags": ["weather", "wttr.in", "forecast", "utility", "linux", "amd64"],
+      "min_version": "0.2.0-beta.1"
+    },
+    {
+      "name": "weather",
+      "version": "1.0.0",
+      "description": "Get weather information using wttr.in",
+      "author": "Cod-e-Codes",
+      "homepage": "https://github.com/Cod-e-Codes/marchat-plugins",
+      "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v3.0.0/weather-plugin-v1.0.0-linux-arm64.zip",
+      "checksum": "sha256:7063710b54b7d2f80a2e2a309331bcd99b7d22e5a42ffb0f3fd2500b997c621b",
+      "goos": "linux",
+      "goarch": "arm64",
+      "category": "utility",
+      "tags": ["weather", "wttr.in", "forecast", "utility", "linux", "arm64"],
       "min_version": "0.2.0-beta.1"
     },
     {
@@ -126,6 +168,20 @@
       "goarch": "amd64",
       "category": "utility",
       "tags": ["git", "development", "utility", "linux", "amd64"],
+      "min_version": "0.2.0-beta.1"
+    },
+    {
+      "name": "githooks",
+      "version": "1.0.0",
+      "description": "Git repository management and status updates",
+      "author": "Cod-e-Codes",
+      "homepage": "https://github.com/Cod-e-Codes/marchat-plugins",
+      "download_url": "https://github.com/Cod-e-Codes/marchat-plugins/releases/download/v3.0.0/githooks-plugin-v1.0.0-linux-arm64.zip",
+      "checksum": "sha256:efeea4732069d61dbfc42c512b4d1aa6b0a1e83e0397bd7e1c347b71efbb31fb",
+      "goos": "linux",
+      "goarch": "arm64",
+      "category": "utility",
+      "tags": ["git", "development", "utility", "linux", "arm64"],
       "min_version": "0.2.0-beta.1"
     },
     {

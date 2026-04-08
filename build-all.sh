@@ -2,8 +2,8 @@
 set -euo pipefail
 
 VERSION="${1:-1.0.0}"
-PLUGINS=("weather" "githooks")
-PLATFORMS=("windows/amd64" "linux/amd64" "darwin/amd64" "darwin/arm64")
+PLUGINS=("echo" "weather" "githooks")
+PLATFORMS=("windows/amd64" "linux/amd64" "linux/arm64" "darwin/amd64" "darwin/arm64")
 
 echo "Building all plugins for all platforms (v$VERSION)"
 echo ""

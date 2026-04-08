@@ -2,7 +2,7 @@
 set -euo pipefail
 
 VERSION="${1:-1.0.0}"
-PLUGINS=("weather" "githooks")
+PLUGINS=("echo" "weather" "githooks")
 
 echo "Collecting checksums for version $VERSION"
 echo ""

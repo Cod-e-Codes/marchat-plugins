@@ -4,10 +4,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$Plugins = @("weather", "githooks")
+$Plugins = @("echo", "weather", "githooks")
 $Platforms = @(
     @{Os = "windows"; Arch = "amd64"},
     @{Os = "linux"; Arch = "amd64"},
+    @{Os = "linux"; Arch = "arm64"},
     @{Os = "darwin"; Arch = "amd64"},
     @{Os = "darwin"; Arch = "arm64"}
 )

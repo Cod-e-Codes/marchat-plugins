@@ -4,7 +4,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$Plugins = @("weather", "githooks")
+$Plugins = @("echo", "weather", "githooks")
 
 Write-Host "Collecting checksums for version $Version" -ForegroundColor Cyan
 Write-Host ""
