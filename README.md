@@ -21,7 +21,7 @@ The server is designed so **plugin IPC cannot block the hub** while chat is broa
 
 - Only messages with `type` **`text`** are forwarded to plugins (typing, reactions, and other types are not).
 - Fan-out runs **off the hub goroutine**: the hub delivers to WebSocket clients first, then schedules plugin notification separately.
-- Each running plugin has a **bounded outbound queue** in the host (depth is defined in marchat `plugin/host`, currently **64** messages). If your plugin falls behind, **new chat lines may be dropped**; the server logs when that happens.
+- Each running plugin has a **bounded outbound queue** in the host (depth is defined in marchat `plugin/host`, currently **64** messages). If your plugin falls behind, **new chat lines may be dropped**; the server logs when that happens. Fan-out is **best-effort** and **at most once per plugin per message** (the host does not retry).
 - **`OnMessage` should return quickly** and must not block the stdio read loop for long work. Offload heavy work to your own goroutines inside the plugin process if needed.
 - Plugin JSON on stdin/stdout is unchanged; see [marchat **PLUGIN_ECOSYSTEM.md**](https://github.com/Cod-e-Codes/marchat/blob/main/PLUGIN_ECOSYSTEM.md) and [**plugin/README.md**](https://github.com/Cod-e-Codes/marchat/blob/main/plugin/README.md) for protocol and routing details.
 
