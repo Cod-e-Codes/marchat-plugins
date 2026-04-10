@@ -15,6 +15,16 @@ Plugins are now distributed as a single binary targeted to a specific platform (
 
 If a user installs a plugin binary for the wrong platform, the host will refuse to start the plugin and display a helpful message indicating the required `GOOS/GOARCH`.
 
+## Chat delivery from the marchat host
+
+The server is designed so **plugin IPC cannot block the hub** while chat is broadcast to clients.
+
+- Only messages with `type` **`text`** are forwarded to plugins (typing, reactions, and other types are not).
+- Fan-out runs **off the hub goroutine**: the hub delivers to WebSocket clients first, then schedules plugin notification separately.
+- Each running plugin has a **bounded outbound queue** in the host (depth is defined in marchat `plugin/host`, currently **64** messages). If your plugin falls behind, **new chat lines may be dropped**; the server logs when that happens.
+- **`OnMessage` should return quickly** and must not block the stdio read loop for long work. Offload heavy work to your own goroutines inside the plugin process if needed.
+- Plugin JSON on stdin/stdout is unchanged; see [marchat **PLUGIN_ECOSYSTEM.md**](https://github.com/Cod-e-Codes/marchat/blob/main/PLUGIN_ECOSYSTEM.md) and [**plugin/README.md**](https://github.com/Cod-e-Codes/marchat/blob/main/plugin/README.md) for protocol and routing details.
+
 ## Available Plugins
 
 - **echo** (v2.0.1): Simple echo plugin for testing the plugin system

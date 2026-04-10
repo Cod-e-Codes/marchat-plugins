@@ -43,6 +43,10 @@ myplugin/
 
 ## Development
 
+### Host behavior (marchat server)
+
+The marchat server uses a **non-blocking** path for chat fan-out to plugins: a **bounded queue per plugin** and a dedicated writer so a slow plugin cannot stall the hub. If the queue fills, **chat deliveries may be dropped** (check server logs). **Implement `OnMessage` to return promptly**; do long work in a goroutine so you keep reading stdin. Only **`text`** messages are forwarded. Details: [marchat PLUGIN_ECOSYSTEM.md](https://github.com/Cod-e-Codes/marchat/blob/main/PLUGIN_ECOSYSTEM.md).
+
 ### 1. Use the marchat Plugin SDK
 ```go
 package main
