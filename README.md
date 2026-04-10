@@ -35,7 +35,13 @@ Or install directly:
 
 ## Publishing plugins
 
-When publishing a new plugin release, build and upload one archive per target platform and provide the corresponding checksums. A typical process:
+### Automated (GitHub Actions)
+
+Use **Actions** then **Release plugin archives** (`release.yml`). Pick the plugin folder (`echo`, `weather`, or `githooks`), the **plugin version** string that appears inside each zip name, and the **GitHub release tag** to create or append to. The workflow checks out this repo plus [marchat](https://github.com/Cod-e-Codes/marchat) as a sibling (for the `go.mod` `replace` on `plugin/sdk`), runs each platform `build.sh`, then creates the tag if missing and uploads all `dist/*.zip` files with `gh release upload`. You still need to refresh `registry.json` checksums and URLs after publishing (see `REGISTRY.md` and `collect-checksums.sh` / `collect-checksums.ps1`).
+
+### Manual
+
+When publishing without CI, build and upload one archive per target platform and provide the corresponding checksums. A typical process:
 
 1. Build platform-specific archives (see `plugins/echo/README.md` for examples and scripts):
    - `echo-plugin-v2.0.1-windows-amd64.zip`

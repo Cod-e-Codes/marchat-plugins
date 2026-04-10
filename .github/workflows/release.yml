@@ -1,0 +1,82 @@
+name: Release plugin archives
+
+on:
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: 'Plugin directory under plugins/'
+        required: true
+        type: choice
+        options:
+          - echo
+          - weather
+          - githooks
+      plugin_version:
+        description: 'Version embedded in zip names (e.g. 2.0.2)'
+        required: true
+      release_tag:
+        description: 'GitHub release tag to create or upload to (e.g. v2.0.2)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout marchat-plugins
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: marchat-plugins
+
+      - name: Checkout marchat (sibling for go.mod replace)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: Cod-e-Codes/marchat
+          path: marchat
+
+      - name: Set up Go
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: '1.25.9'
+
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Build all targets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PLUGIN: ${{ github.event.inputs.plugin }}
+          VERSION: ${{ github.event.inputs.plugin_version }}
+          TAG: ${{ github.event.inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          ROOT="${GITHUB_WORKSPACE}/marchat-plugins"
+          cd "${ROOT}/plugins/${PLUGIN}"
+          go mod tidy
+          for pair in windows/amd64 linux/amd64 linux/arm64 darwin/amd64 darwin/arm64; do
+            export GOOS="${pair%/*}"
+            export GOARCH="${pair#*/}"
+            export VERSION
+            bash build.sh
+          done
+          echo "Built archives:"
+          ls -la dist/*.zip
+          if ! command -v gh >/dev/null 2>&1; then
+            echo "gh CLI missing" >&2
+            exit 1
+          fi
+          cd "${ROOT}"
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "Uploading to existing release ${TAG}"
+          else
+            gh release create "${TAG}" --title "${TAG}" --generate-notes
+          fi
+          shopt -s nullglob
+          files=( "plugins/${PLUGIN}/dist/"*.zip )
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No zip files to upload" >&2
+            exit 1
+          fi
+          gh release upload "${TAG}" "${files[@]}" --clobber

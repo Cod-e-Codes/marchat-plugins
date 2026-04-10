@@ -1,0 +1,53 @@
+name: Plugins CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: [echo, weather, githooks]
+    steps:
+      - name: Checkout marchat-plugins
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: marchat-plugins
+
+      - name: Checkout marchat (for replace path)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: Cod-e-Codes/marchat
+          path: marchat
+
+      - name: Set up Go
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version: '1.25.9'
+
+      - name: Lint and test (${{ matrix.plugin }})
+        env:
+          GOTOOLCHAIN: auto
+        run: |
+          set -euo pipefail
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          LINT="$(go env GOPATH)/bin/golangci-lint"
+          VULN="$(go env GOPATH)/bin/govulncheck"
+          cd "${GITHUB_WORKSPACE}/marchat-plugins/plugins/${{ matrix.plugin }}"
+          go mod tidy
+          out="$(gofmt -l .)"
+          if [ -n "$out" ]; then echo "Unformatted:"; echo "$out"; exit 1; fi
+          go build ./...
+          go test ./... -count=1
+          go vet ./...
+          "$VULN" -show verbose ./...
+          "$LINT" run ./...

@@ -31,7 +31,6 @@ func NewGitHooksPlugin() *GitHooksPlugin {
 func (p *GitHooksPlugin) Init(config sdk.Config) error {
 	p.config = config
 
-	// Check if git is available
 	if _, err := exec.LookPath("git"); err != nil {
 		return fmt.Errorf("git command not found: %w", err)
 	}
@@ -87,7 +86,6 @@ func (p *GitHooksPlugin) getGitStatus(repoPath string) (string, error) {
 		repoPath = "."
 	}
 
-	// Check if directory exists and is a git repository
 	gitDir := filepath.Join(repoPath, ".git")
 	if _, err := os.Stat(gitDir); os.IsNotExist(err) {
 		return "", fmt.Errorf("not a git repository: %s", repoPath)
@@ -141,14 +139,12 @@ func (p *GitHooksPlugin) getGitBranch(repoPath string) (string, error) {
 		repoPath = "."
 	}
 
-	// Get current branch
 	cmd := exec.Command("git", "-C", repoPath, "branch", "--show-current")
 	currentBranch, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("failed to get current branch: %w", err)
 	}
 
-	// Get all branches
 	cmd = exec.Command("git", "-C", repoPath, "branch", "-a")
 	branches, err := cmd.CombinedOutput()
 	if err != nil {
@@ -187,201 +183,91 @@ func (p *GitHooksPlugin) getGitDiff(repoPath string) (string, error) {
 	return result, nil
 }
 
-// main function for the plugin
 func main() {
 	plugin := NewGitHooksPlugin()
-
-	// Set up JSON communication
-	decoder := json.NewDecoder(os.Stdin)
-	encoder := json.NewEncoder(os.Stdout)
-
-	// Log to stderr
-	log.SetOutput(os.Stderr)
-
-	for {
-		var req sdk.PluginRequest
-		if err := decoder.Decode(&req); err != nil {
-			log.Printf("Failed to decode request: %v", err)
-			break
-		}
-
-		response := plugin.handleRequest(req)
-
-		if err := encoder.Encode(response); err != nil {
-			log.Printf("Failed to encode response: %v", err)
-			break
-		}
+	if err := sdk.RunStdio(plugin, plugin.handleCommand); err != nil {
+		log.Fatalf("plugin exited: %v", err)
 	}
 }
 
-// handleRequest handles incoming requests
-func (p *GitHooksPlugin) handleRequest(req sdk.PluginRequest) sdk.PluginResponse {
-	switch req.Type {
-	case "init":
-		var initData map[string]interface{}
-		if err := json.Unmarshal(req.Data, &initData); err != nil {
-			return sdk.PluginResponse{
-				Type:    "init",
-				Success: false,
-				Error:   fmt.Sprintf("failed to parse init data: %v", err),
-			}
+func (p *GitHooksPlugin) handleCommand(command string, args []string) sdk.PluginResponse {
+	var result string
+	var err error
+	repoPath := ""
+
+	switch command {
+	case "git-status":
+		if len(args) > 0 {
+			repoPath = args[0]
 		}
+		result, err = p.getGitStatus(repoPath)
 
-		if configData, ok := initData["config"].(map[string]interface{}); ok {
-			config := sdk.Config{
-				PluginDir: configData["plugin_dir"].(string),
-				DataDir:   configData["data_dir"].(string),
-				Settings:  make(map[string]string),
-			}
-			if settings, ok := configData["settings"].(map[string]interface{}); ok {
-				for k, v := range settings {
-					if str, ok := v.(string); ok {
-						config.Settings[k] = str
-					}
-				}
-			}
-
-			if err := p.Init(config); err != nil {
-				return sdk.PluginResponse{
-					Type:    "init",
-					Success: false,
-					Error:   fmt.Sprintf("failed to initialize plugin: %v", err),
-				}
-			}
+	case "git-log":
+		count := 5
+		if len(args) > 0 {
+			_, _ = fmt.Sscanf(args[0], "%d", &count)
 		}
-
-		return sdk.PluginResponse{
-			Type:    "init",
-			Success: true,
+		if len(args) > 1 {
+			repoPath = args[1]
 		}
+		result, err = p.getGitLog(repoPath, count)
 
-	case "message":
-		var msg sdk.Message
-		if err := json.Unmarshal(req.Data, &msg); err != nil {
-			return sdk.PluginResponse{
-				Type:    "message",
-				Success: false,
-				Error:   fmt.Sprintf("failed to parse message: %v", err),
-			}
+	case "git-branch":
+		if len(args) > 0 {
+			repoPath = args[0]
 		}
+		result, err = p.getGitBranch(repoPath)
 
-		responses, err := p.OnMessage(msg)
-		if err != nil {
-			return sdk.PluginResponse{
-				Type:    "message",
-				Success: false,
-				Error:   fmt.Sprintf("failed to process message: %v", err),
-			}
+	case "git-diff":
+		if len(args) > 0 {
+			repoPath = args[0]
 		}
+		result, err = p.getGitDiff(repoPath)
 
-		if len(responses) > 0 {
-			responseData, _ := json.Marshal(responses[0])
-			return sdk.PluginResponse{
-				Type:    "message",
-				Success: true,
-				Data:    responseData,
-			}
-		}
-
-		return sdk.PluginResponse{
-			Type:    "message",
-			Success: true,
-		}
-
-	case "command":
-		var args []string
-		if err := json.Unmarshal(req.Data, &args); err != nil {
+	case "git-watch":
+		if len(args) == 0 {
 			return sdk.PluginResponse{
 				Type:    "command",
 				Success: false,
-				Error:   fmt.Sprintf("failed to parse command args: %v", err),
+				Error:   "repository path required",
 			}
 		}
-
-		var result string
-		var err error
-		repoPath := ""
-
-		switch req.Command {
-		case "git-status":
-			if len(args) > 0 {
-				repoPath = args[0]
-			}
-			result, err = p.getGitStatus(repoPath)
-
-		case "git-log":
-			count := 5
-			if len(args) > 0 {
-				fmt.Sscanf(args[0], "%d", &count)
-			}
-			if len(args) > 1 {
-				repoPath = args[1]
-			}
-			result, err = p.getGitLog(repoPath, count)
-
-		case "git-branch":
-			if len(args) > 0 {
-				repoPath = args[0]
-			}
-			result, err = p.getGitBranch(repoPath)
-
-		case "git-diff":
-			if len(args) > 0 {
-				repoPath = args[0]
-			}
-			result, err = p.getGitDiff(repoPath)
-
-		case "git-watch":
-			if len(args) == 0 {
-				return sdk.PluginResponse{
-					Type:    "command",
-					Success: false,
-					Error:   "repository path required",
-				}
-			}
-			p.watchedRepo = args[0]
-			result = fmt.Sprintf("Now watching repository: %s", p.watchedRepo)
-
-		default:
-			return sdk.PluginResponse{
-				Type:    "command",
-				Success: false,
-				Error:   "unknown command",
-			}
-		}
-
-		if err != nil {
-			return sdk.PluginResponse{
-				Type:    "command",
-				Success: false,
-				Error:   fmt.Sprintf("command failed: %v", err),
-			}
-		}
-
-		msg := sdk.Message{
-			Sender:    "GitBot",
-			Content:   result,
-			CreatedAt: time.Now(),
-		}
-
-		responseData, _ := json.Marshal(msg)
-		return sdk.PluginResponse{
-			Type:    "message",
-			Success: true,
-			Data:    responseData,
-		}
-
-	case "shutdown":
-		return sdk.PluginResponse{
-			Type:    "shutdown",
-			Success: true,
-		}
+		p.watchedRepo = args[0]
+		result = fmt.Sprintf("Now watching repository: %s", p.watchedRepo)
 
 	default:
 		return sdk.PluginResponse{
-			Type:    req.Type,
+			Type:    "command",
 			Success: false,
-			Error:   "unknown request type",
+			Error:   "unknown command",
 		}
+	}
+
+	if err != nil {
+		return sdk.PluginResponse{
+			Type:    "command",
+			Success: false,
+			Error:   fmt.Sprintf("command failed: %v", err),
+		}
+	}
+
+	msg := sdk.Message{
+		Sender:    "GitBot",
+		Content:   result,
+		CreatedAt: time.Now(),
+	}
+
+	responseData, err := json.Marshal(msg)
+	if err != nil {
+		return sdk.PluginResponse{
+			Type:    "command",
+			Success: false,
+			Error:   err.Error(),
+		}
+	}
+	return sdk.PluginResponse{
+		Type:    "message",
+		Success: true,
+		Data:    responseData,
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -35,12 +34,11 @@ func (p *WeatherPlugin) Init(config sdk.Config) error {
 
 // OnMessage handles incoming messages
 func (p *WeatherPlugin) OnMessage(msg sdk.Message) ([]sdk.Message, error) {
-	// Check for weather queries in messages
 	lower := strings.ToLower(msg.Content)
 	if strings.HasPrefix(lower, "weather:") || strings.HasPrefix(lower, "weather ") {
 		location := strings.TrimSpace(strings.TrimPrefix(strings.TrimPrefix(lower, "weather:"), "weather "))
 		if location == "" {
-			location = "Charlotte,NC" // Default location
+			location = "Charlotte,NC"
 		}
 
 		weather, err := p.getWeather(location, false)
@@ -81,12 +79,10 @@ func (p *WeatherPlugin) Commands() []sdk.PluginCommand {
 
 // getWeather fetches weather data from wttr.in
 func (p *WeatherPlugin) getWeather(location string, forecast bool) (string, error) {
-	// Build URL
 	url := fmt.Sprintf("https://wttr.in/%s?format=j1", location)
 
 	log.Printf("Fetching weather from: %s", url)
 
-	// Make HTTP request
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch weather: %w", err)
@@ -97,19 +93,16 @@ func (p *WeatherPlugin) getWeather(location string, forecast bool) (string, erro
 		return "", fmt.Errorf("weather service returned status %d", resp.StatusCode)
 	}
 
-	// Read response
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("failed to read response: %w", err)
 	}
 
-	// Parse JSON response
 	var data map[string]interface{}
 	if err := json.Unmarshal(body, &data); err != nil {
 		return "", fmt.Errorf("failed to parse weather data: %w", err)
 	}
 
-	// Extract current conditions
 	currentCondition, ok := data["current_condition"].([]interface{})
 	if !ok || len(currentCondition) == 0 {
 		return "", fmt.Errorf("no current condition data")
@@ -117,14 +110,12 @@ func (p *WeatherPlugin) getWeather(location string, forecast bool) (string, erro
 
 	current := currentCondition[0].(map[string]interface{})
 
-	// Format weather information
 	temp := current["temp_C"].(string)
 	feelsLike := current["FeelsLikeC"].(string)
 	weatherDesc := current["weatherDesc"].([]interface{})[0].(map[string]interface{})["value"].(string)
 	humidity := current["humidity"].(string)
 	windSpeed := current["windspeedKmph"].(string)
 
-	// Get location info
 	nearestArea := data["nearest_area"].([]interface{})[0].(map[string]interface{})
 	areaName := nearestArea["areaName"].([]interface{})[0].(map[string]interface{})["value"].(string)
 	country := nearestArea["country"].([]interface{})[0].(map[string]interface{})["value"].(string)
@@ -135,7 +126,6 @@ func (p *WeatherPlugin) getWeather(location string, forecast bool) (string, erro
 	result += fmt.Sprintf("Humidity: %s%%\n", humidity)
 	result += fmt.Sprintf("Wind Speed: %s km/h", windSpeed)
 
-	// Add forecast if requested
 	if forecast {
 		weather, ok := data["weather"].([]interface{})
 		if ok && len(weather) > 0 {
@@ -160,170 +150,60 @@ func (p *WeatherPlugin) getWeather(location string, forecast bool) (string, erro
 	return result, nil
 }
 
-// main function for the plugin
 func main() {
 	plugin := NewWeatherPlugin()
-
-	// Set up JSON communication
-	decoder := json.NewDecoder(os.Stdin)
-	encoder := json.NewEncoder(os.Stdout)
-
-	// Log to stderr
-	log.SetOutput(os.Stderr)
-
-	for {
-		var req sdk.PluginRequest
-		if err := decoder.Decode(&req); err != nil {
-			log.Printf("Failed to decode request: %v", err)
-			break
-		}
-
-		response := plugin.handleRequest(req)
-
-		if err := encoder.Encode(response); err != nil {
-			log.Printf("Failed to encode response: %v", err)
-			break
-		}
+	if err := sdk.RunStdio(plugin, plugin.handleCommand); err != nil {
+		log.Fatalf("plugin exited: %v", err)
 	}
 }
 
-// handleRequest handles incoming requests
-func (p *WeatherPlugin) handleRequest(req sdk.PluginRequest) sdk.PluginResponse {
-	switch req.Type {
-	case "init":
-		var initData map[string]interface{}
-		if err := json.Unmarshal(req.Data, &initData); err != nil {
-			return sdk.PluginResponse{
-				Type:    "init",
-				Success: false,
-				Error:   fmt.Sprintf("failed to parse init data: %v", err),
-			}
-		}
+func (p *WeatherPlugin) handleCommand(command string, args []string) sdk.PluginResponse {
+	location := "Charlotte,NC"
+	if len(args) > 0 {
+		location = strings.Join(args, " ")
+	}
 
-		if configData, ok := initData["config"].(map[string]interface{}); ok {
-			config := sdk.Config{
-				PluginDir: configData["plugin_dir"].(string),
-				DataDir:   configData["data_dir"].(string),
-				Settings:  make(map[string]string),
-			}
-			if settings, ok := configData["settings"].(map[string]interface{}); ok {
-				for k, v := range settings {
-					if str, ok := v.(string); ok {
-						config.Settings[k] = str
-					}
-				}
-			}
+	var weather string
+	var err error
 
-			if err := p.Init(config); err != nil {
-				return sdk.PluginResponse{
-					Type:    "init",
-					Success: false,
-					Error:   fmt.Sprintf("failed to initialize plugin: %v", err),
-				}
-			}
-		}
-
-		return sdk.PluginResponse{
-			Type:    "init",
-			Success: true,
-		}
-
-	case "message":
-		var msg sdk.Message
-		if err := json.Unmarshal(req.Data, &msg); err != nil {
-			return sdk.PluginResponse{
-				Type:    "message",
-				Success: false,
-				Error:   fmt.Sprintf("failed to parse message: %v", err),
-			}
-		}
-
-		responses, err := p.OnMessage(msg)
-		if err != nil {
-			return sdk.PluginResponse{
-				Type:    "message",
-				Success: false,
-				Error:   fmt.Sprintf("failed to process message: %v", err),
-			}
-		}
-
-		if len(responses) > 0 {
-			responseData, _ := json.Marshal(responses[0])
-			return sdk.PluginResponse{
-				Type:    "message",
-				Success: true,
-				Data:    responseData,
-			}
-		}
-
-		return sdk.PluginResponse{
-			Type:    "message",
-			Success: true,
-		}
-
-	case "command":
-		var args []string
-		if err := json.Unmarshal(req.Data, &args); err != nil {
-			return sdk.PluginResponse{
-				Type:    "command",
-				Success: false,
-				Error:   fmt.Sprintf("failed to parse command args: %v", err),
-			}
-		}
-
-		location := "Charlotte,NC" // Default
-		if len(args) > 0 {
-			location = strings.Join(args, " ")
-		}
-
-		var weather string
-		var err error
-
-		switch req.Command {
-		case "weather":
-			weather, err = p.getWeather(location, false)
-		case "forecast":
-			weather, err = p.getWeather(location, true)
-		default:
-			return sdk.PluginResponse{
-				Type:    "command",
-				Success: false,
-				Error:   "unknown command",
-			}
-		}
-
-		if err != nil {
-			return sdk.PluginResponse{
-				Type:    "command",
-				Success: false,
-				Error:   fmt.Sprintf("failed to get weather: %v", err),
-			}
-		}
-
-		weatherMsg := sdk.Message{
-			Sender:    "WeatherBot",
-			Content:   weather,
-			CreatedAt: time.Now(),
-		}
-
-		responseData, _ := json.Marshal(weatherMsg)
-		return sdk.PluginResponse{
-			Type:    "message",
-			Success: true,
-			Data:    responseData,
-		}
-
-	case "shutdown":
-		return sdk.PluginResponse{
-			Type:    "shutdown",
-			Success: true,
-		}
-
+	switch command {
+	case "weather":
+		weather, err = p.getWeather(location, false)
+	case "forecast":
+		weather, err = p.getWeather(location, true)
 	default:
 		return sdk.PluginResponse{
-			Type:    req.Type,
+			Type:    "command",
 			Success: false,
-			Error:   "unknown request type",
+			Error:   "unknown command",
 		}
+	}
+
+	if err != nil {
+		return sdk.PluginResponse{
+			Type:    "command",
+			Success: false,
+			Error:   fmt.Sprintf("failed to get weather: %v", err),
+		}
+	}
+
+	weatherMsg := sdk.Message{
+		Sender:    "WeatherBot",
+		Content:   weather,
+		CreatedAt: time.Now(),
+	}
+
+	responseData, err := json.Marshal(weatherMsg)
+	if err != nil {
+		return sdk.PluginResponse{
+			Type:    "command",
+			Success: false,
+			Error:   err.Error(),
+		}
+	}
+	return sdk.PluginResponse{
+		Type:    "message",
+		Success: true,
+		Data:    responseData,
 	}
 }
