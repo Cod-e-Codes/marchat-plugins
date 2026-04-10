@@ -20,6 +20,9 @@ profile.cov
 # Build artifacts
 dist/
 
+# Ad-hoc plugin zip downloads (e.g. hash checks from Releases)
+echo-t.zip
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
